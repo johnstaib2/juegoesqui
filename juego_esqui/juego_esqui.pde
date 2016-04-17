@@ -30,6 +30,10 @@ int getVelEsquiador() {
 
 void setup() {
   size(640, 860);
+  if (myPort == null) {
+    myPort = new Serial(this, Serial.list()[0], 115200);
+  }
+  myPort.write("s");
   bg= loadImage("nieve.png");
   photo = loadImage("esquiizq.png");
   photo2 = loadImage("esquider.png");
@@ -41,32 +45,31 @@ void setup() {
   vel=1;
   vidas=3;
   gameover=false;
-  if(myPort == null) {
-    myPort = new Serial(this,Serial.list()[0],115200);
-}
 }
 void draw () {
+  myPort.write("s");
+  print(Serial.list());
   serialEvent();
   if (gameover==false) {
     background(bg);
-  
+
     posEsquiador+=velEsq;
     xP=xP+vel;
-    image(bandera,posXban, xP);
-    image(bandera,posXban+anchuraBan, xP);
+    image(bandera, posXban, xP);
+    image(bandera, posXban+anchuraBan, xP);
     fill(200, 202, 253);
-   /* triangle(posEsquiador-15, 350, posEsquiador+15, 350, posEsquiador, 325);*/
-    if (getVelEsquiador()==2){
-    image(photo,posEsquiador-15,width-90);
-    }else{
-   image(photo2,posEsquiador-15,width-90);
+    /* triangle(posEsquiador-15, 350, posEsquiador+15, 350, posEsquiador, 325);*/
+    if (getVelEsquiador()==2) {
+      image(photo, posEsquiador-15, width-90);
+    } else {
+      image(photo2, posEsquiador-15, width-90);
     }
-    
-    
+
+
     //image(photo, mouseX-15,200);
     if (xP==width+50) {
       xP=0;
-      posXban=(int)random(80,550);
+      posXban=(int)random(80, 550);
     }
     textSize(32);
     fill(0, 102, 153);
@@ -85,10 +88,9 @@ void draw () {
     }
     if (posEsquiador-15<=0) {
       posEsquiador=15;
-    }else if (posEsquiador+15>=640) {
+    } else if (posEsquiador+15>=640) {
       posEsquiador=625;
     }
-    myPort.write("s");
   }
   if (vidas==0) {
     text("GAME OVER", 250, 200);
@@ -107,29 +109,26 @@ void mouseClicked() {
 void serialEvent()
 {
   message = myPort.readStringUntil(13);
-  if (message != null){
+  if (message != null) {
+    print(message);
     ypr = split(message, ",");
     yaw = -float(ypr[0]);
     pitch = -float(ypr[1]);
     roll = float(ypr[2]);
   }
-  
+
   boolean right = (Math.abs(pitch)>Math.abs(yaw) && pitch >2000);
   boolean left = (Math.abs(pitch)>Math.abs(yaw) && pitch <-2000);
-   boolean up = (Math.abs(pitch)<Math.abs(yaw) && pitch <-2000);
+  boolean up = (Math.abs(pitch)<Math.abs(yaw) && pitch <-2000);
   boolean down = (Math.abs(pitch)<Math.abs(yaw) && pitch >2000);
-  
+
   if (right) {
     velEsq=2;
-   
   } else if (left) {
     velEsq=-2;
-   
-  } else if(up) {
+  } else if (up) {
     velEsq=0;
-    
   } else if (down) {
     velEsq=0;
-   
-  } 
+  }
 }
